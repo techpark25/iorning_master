@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:laundry_app/AddtoCart.dart';
 import 'Schedule.dart';
+import 'AddtoCart.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Product Selector',
+      title: 'Select Items',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -101,9 +103,15 @@ class _ProductsPageState extends State<ProductsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Select the Products'),
-      // ),
+      appBar: AppBar(
+        title: const Text('Select Items'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Go back to the previous screen
+          },
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -292,7 +300,16 @@ class _ProductsPageState extends State<ProductsPage> {
             // Book Timing Button with Bottom Margin
             Container(
               margin: const EdgeInsets.only(bottom: 20.0), // Set bottom margin
+              width: double.infinity, // Make the button take full width
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.transparent, // Set background color as transparent
+                  shadowColor:
+                      Colors.transparent, // Remove shadow if not needed
+                  padding: EdgeInsets
+                      .zero, // Remove padding to apply gradient correctly
+                ),
                 onPressed: () {
                   // Handle book timing logic
                   List<Map<String, dynamic>> selectedProducts = [
@@ -325,31 +342,39 @@ class _ProductsPageState extends State<ProductsPage> {
                     );
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Schedule()),
+                      MaterialPageRoute(builder: (context) => AddToCart()),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('No products selected!'),
+                        content: Text('No products selected.'),
                       ),
                     );
                   }
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.green, // Background color set to green
-                  minimumSize:
-                      Size(800, 50), // Increase width (200px) and height (50px)
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        20.0), // Rounded corners for the button
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFFDC846), // Golden Yellow
+                        Color(0xFFD32943), // Red
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius:
+                        BorderRadius.circular(8.0), // Optional: Rounded corners
                   ),
-                ),
-                child: const Text(
-                  'Schedule Now',
-                  style: TextStyle(
-                    fontSize: 16, // You can adjust the font size as well
-                    color: Colors.white,
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15.0), // Optional: Adjust vertical padding
+                    child: const Text(
+                      'Add to Cart',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16), // Text color for the button
+                    ),
                   ),
                 ),
               ),

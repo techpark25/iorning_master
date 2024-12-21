@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'OrderPlaced.dart';
 
 class Schedule extends StatefulWidget {
   const Schedule({super.key});
@@ -22,6 +23,7 @@ class _ScheduleState extends State<Schedule> {
   final double deliveryFee = 0.0;
   final double discount = 20.40;
   double totalAmount = 0.0;
+  final TextEditingController locationController = TextEditingController();
 
   @override
   void initState() {
@@ -45,17 +47,18 @@ class _ScheduleState extends State<Schedule> {
   }
 
   void checkout() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Checkout in progress')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => OrderPlaced()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Changed to white
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white, // Changed to white
+        backgroundColor: Colors.white,
         title: const Text(
           'Schedule Appointment',
           style: TextStyle(color: Colors.black),
@@ -68,7 +71,6 @@ class _ScheduleState extends State<Schedule> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Pickup Date Section
             const Text(
               "Pickup Date",
               style: TextStyle(fontSize: 18, color: Colors.black),
@@ -92,8 +94,8 @@ class _ScheduleState extends State<Schedule> {
                       gradient: isSelected
                           ? const LinearGradient(
                               colors: [
-                                Color(0xFFFDC846), // Golden Yellow
-                                Color(0xFFD32943), // Red
+                                Color(0xFFFDC846),
+                                Color(0xFFD32943),
                               ],
                             )
                           : null,
@@ -112,8 +114,9 @@ class _ScheduleState extends State<Schedule> {
                             'Fri',
                             'Sat'
                           ][day.weekday % 7],
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 12),
+                          style: TextStyle(
+                              color: isSelected ? Colors.white : Colors.black,
+                              fontSize: 12),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -130,10 +133,7 @@ class _ScheduleState extends State<Schedule> {
                 );
               }),
             ),
-
             const SizedBox(height: 20),
-
-            // Pickup Time Section
             const Text(
               "Pickup Time",
               style: TextStyle(fontSize: 18, color: Colors.black),
@@ -164,8 +164,8 @@ class _ScheduleState extends State<Schedule> {
                       gradient: isSelected
                           ? const LinearGradient(
                               colors: [
-                                Color(0xFFFDC846), // Golden Yellow
-                                Color(0xFFD32943), // Red
+                                Color(0xFFFDC846),
+                                Color(0xFFD32943),
                               ],
                             )
                           : null,
@@ -184,10 +184,24 @@ class _ScheduleState extends State<Schedule> {
                 );
               },
             ),
-
             const SizedBox(height: 20),
-
-            // Price Breakdown Section
+            const Text(
+              "Add Location",
+              style: TextStyle(fontSize: 18, color: Colors.black),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: locationController,
+              decoration: InputDecoration(
+                hintText: 'Enter your location',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
+              ),
+            ),
+            const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -196,19 +210,16 @@ class _ScheduleState extends State<Schedule> {
               ),
               child: Column(
                 children: [
-                  priceRow("Item", "\$$itemPrice"),
-                  priceRow("Delivery", "\$$deliveryFee"),
-                  priceRow("Discount", "-\$$discount"),
+                  priceRow("Item", "\₹$itemPrice"),
+                  priceRow("Delivery", "\₹$deliveryFee"),
+                  priceRow("Discount", "-\₹$discount"),
                   const Divider(color: Colors.grey),
-                  priceRow("Total", "\$${totalAmount.toStringAsFixed(2)}",
+                  priceRow("Total", "\₹${totalAmount.toStringAsFixed(2)}",
                       isBold: true),
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // Checkout Button
             ElevatedButton(
               onPressed: selectedTime == null ? null : checkout,
               style: ElevatedButton.styleFrom(
@@ -222,8 +233,8 @@ class _ScheduleState extends State<Schedule> {
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFFFDC846), // Golden Yellow
-                      Color(0xFFD32943), // Red
+                      Color(0xFFFDC846),
+                      Color(0xFFD32943),
                     ],
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -231,7 +242,7 @@ class _ScheduleState extends State<Schedule> {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: const Center(
                   child: Text(
-                    "Checkout",
+                    "Place Order",
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.white,
@@ -264,7 +275,7 @@ class _ScheduleState extends State<Schedule> {
           Text(
             amount,
             style: TextStyle(
-              color: isBold ? Colors.black : Colors.black,
+              color: Colors.black,
               fontSize: 16,
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
             ),
@@ -273,11 +284,4 @@ class _ScheduleState extends State<Schedule> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: Schedule(),
-    debugShowCheckedModeBanner: false,
-  ));
 }

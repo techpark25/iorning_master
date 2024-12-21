@@ -3,6 +3,7 @@ import 'components/my_button.dart';
 import 'components/my_textfield.dart';
 import 'package:flutter/material.dart';
 import 'signup.dart';
+import 'ForgetPassword.dart';
 
 class Login extends StatelessWidget {
   Login({super.key});
@@ -72,7 +73,7 @@ class Login extends StatelessWidget {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(30))),
                         width: MediaQuery.of(context).size.width * 0.9,
-                        height: MediaQuery.of(context).size.height * 0.4,
+                        height: MediaQuery.of(context).size.height * 0.45,
                         child: Form(
                           key: _formKey,
                           child: Center(
@@ -80,6 +81,7 @@ class Login extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                const SizedBox(height: 20),
                                 MyTextField(
                                   controller: passwordController,
                                   hintText: 'Enter Username',
@@ -131,6 +133,29 @@ class Login extends StatelessWidget {
                                     ),
                                   ),
                                 ),
+
+                                const SizedBox(height: 10),
+
+                                GestureDetector(
+                                  onTap: () {
+                                    // Navigate to Signup page when clicked
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ForgetPassword()), // Navigate to Signup page
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Forgot Password?',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15),
+                                    textAlign: TextAlign.start,
+                                  ),
+                                ),
+
                                 const SizedBox(height: 30),
 
                                 GestureDetector(
@@ -144,7 +169,7 @@ class Login extends StatelessWidget {
                                     );
                                   },
                                   child: const Text(
-                                    'Forgot Password?',
+                                    'Do not have an account ? Sign up !',
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
