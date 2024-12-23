@@ -8,6 +8,9 @@ class Schedule extends StatefulWidget {
   _ScheduleState createState() => _ScheduleState();
 }
 
+bool isCOD = false; // To track COD selection
+bool isOnlinePayment = false; // To track Online Payment selection
+
 class _ScheduleState extends State<Schedule> {
   DateTime selectedDate = DateTime.now();
   String? selectedTime;
@@ -200,6 +203,48 @@ class _ScheduleState extends State<Schedule> {
                 filled: true,
                 fillColor: Colors.grey[200],
               ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Payment Method",
+              style: TextStyle(fontSize: 18, color: Colors.black),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: isCOD,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isCOD = value ?? false;
+                            isOnlinePayment = !isCOD; // Ensure one is selected
+                          });
+                        },
+                      ),
+                      const Text("COD"),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: isOnlinePayment,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isOnlinePayment = value ?? false;
+                            isCOD = !isOnlinePayment; // Ensure one is selected
+                          });
+                        },
+                      ),
+                      const Text("Online Payment"),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             Container(

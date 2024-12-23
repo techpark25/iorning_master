@@ -189,6 +189,7 @@ class _ProductsPageState extends State<ProductsPage> {
             const SizedBox(height: 16.0),
 
             // Product List for Active Category
+
             Expanded(
               child: ListView.builder(
                 itemCount: activeCategory == "Men"
@@ -347,7 +348,7 @@ class _ProductsPageState extends State<ProductsPage> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('No products selected.'),
+                        content: Text('No products selected'),
                       ),
                     );
                   }
