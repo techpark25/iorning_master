@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:laundry_application/presentation/home/home_screen.dart';
-import 'package:laundry_application/presentation/main/main_screen.dart';
 import 'package:laundry_application/utils/api_status.dart';
 import 'package:provider/provider.dart';
 
@@ -47,32 +45,39 @@ class _LocationScreenState extends State<LocationScreen> {
   Future<void> _getCurrentLocation() async {
     try {
       LocationPermission permission = await Geolocator.requestPermission();
+
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Location permission denied")));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Location permission denied")));
+        }
         return;
       }
 
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
 
-      setState(() {
-        _currentLocation = LatLng(position.latitude, position.longitude);
-        _markers.clear();
-        _markers.add(
-          Marker(
-            markerId: const MarkerId('current-location'),
-            position: _currentLocation!,
-            infoWindow: const InfoWindow(title: 'Your Location'),
-          ),
-        );
-        _mapController
-            ?.animateCamera(CameraUpdate.newLatLngZoom(_currentLocation!, 15));
-      });
+      if (mounted) {
+        setState(() {
+          _currentLocation = LatLng(position.latitude, position.longitude);
+          _markers.clear();
+          _markers.add(
+            Marker(
+              markerId: const MarkerId('current-location'),
+              position: _currentLocation!,
+              infoWindow: const InfoWindow(title: 'Your Location'),
+            ),
+          );
+          _mapController?.animateCamera(
+              CameraUpdate.newLatLngZoom(_currentLocation!, 15));
+        });
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to get current location")));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to get current location")));
+      }
     }
   }
 
@@ -81,16 +86,18 @@ class _LocationScreenState extends State<LocationScreen> {
       List<Placemark> placemarks =
           await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
 
-      if (placemarks.isNotEmpty) {
+      if (mounted && placemarks.isNotEmpty) {
         setState(() {
           _address = '${placemarks[0].street}, ${placemarks[0].locality}, '
               '${placemarks[0].administrativeArea}, ${placemarks[0].country}';
         });
       }
     } catch (e) {
-      setState(() {
-        _address = "Fetching Address...";
-      });
+      if (mounted) {
+        setState(() {
+          _address = "Fetching Address...";
+        });
+      }
     }
   }
 
@@ -122,10 +129,11 @@ class _LocationScreenState extends State<LocationScreen> {
                   pincode: pincodeController.text,
                   status: true,
                 );
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MainScreen()),
-                );
+                Navigator.pop(context);
+                                Navigator.pop(context);
+                                                                Navigator.pop(context);
+
+
               },
       ),
     );

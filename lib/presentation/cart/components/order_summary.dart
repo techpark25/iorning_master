@@ -4,12 +4,14 @@ class OrderSummary extends StatelessWidget {
   final int itemPrice;
   final double deliveryFee;
   final double totalAmount;
+  final double discount;
 
   const OrderSummary({
     Key? key,
     required this.itemPrice,
     required this.deliveryFee,
     required this.totalAmount,
+    required this.discount,
   }) : super(key: key);
 
   @override
@@ -23,9 +25,11 @@ class OrderSummary extends StatelessWidget {
       child: Column(
         children: [
           _priceRow("Item", "\₹$itemPrice"),
+          _priceRow("Discount", "\₹$discount"),
           _priceRow("Delivery", "\₹$deliveryFee"),
           const Divider(color: Colors.grey),
-          _priceRow("Total", "\₹${totalAmount.toStringAsFixed(2)}", isBold: true),
+          _priceRow("Total", "\₹${totalAmount.toStringAsFixed(2)}",
+              isBold: true),
         ],
       ),
     );

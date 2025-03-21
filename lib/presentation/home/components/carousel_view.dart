@@ -24,7 +24,9 @@ class _CarouselViewwState extends State<CarouselVieww> {
   @override
   Widget build(BuildContext context) {
     final double height = MediaQuery.of(context).size.height;
-    final double carouselHeight = height * 0.22;
+    final double carouselHeight = height * 0.20;
+    final double width = MediaQuery.of(context).size.height;
+    final double carouselWidth = width * 0.20;
 
     if (widget.isLoading) {
       return const Center(
@@ -47,12 +49,17 @@ class _CarouselViewwState extends State<CarouselVieww> {
         CarouselSlider.builder(
           itemCount: widget.images.length,
           options: CarouselOptions(
+            height: MediaQuery.of(context).size.height * 0.25,
             viewportFraction: 1,
             autoPlay: true,
             autoPlayInterval: const Duration(seconds: 3),
-            enlargeCenterPage: true,
+            enlargeCenterPage: false, // No zoom effect
             reverse: false,
-            onPageChanged: (index, i) {
+            autoPlayAnimationDuration:
+                const Duration(milliseconds: 500), // Fast transition
+            autoPlayCurve: Curves.linear, // Linear movement, no fade-in effect
+            scrollPhysics: const BouncingScrollPhysics(), // Smooth scrolling
+            onPageChanged: (index, reason) {
               setState(() {
                 currentIndex = index;
               });
@@ -60,18 +67,11 @@ class _CarouselViewwState extends State<CarouselVieww> {
           ),
           itemBuilder: (context, i, id) => Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Card(
-              margin: const EdgeInsets.only(
-                top: 10.0,
-              ),
-              elevation: 6.0,
-              shadowColor: Colors.redAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0),
-              ),
+            child: SizedBox(
+              width: double.infinity,
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(
-                  Radius.circular(30.0),
+                  Radius.circular(5.0),
                 ),
                 child: CarouselImage(imageUrl: widget.images[i].imagePath),
               ),

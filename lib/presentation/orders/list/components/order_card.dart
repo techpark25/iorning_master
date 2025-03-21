@@ -42,9 +42,11 @@ class OrderCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    DateFormat('dd-mm-yyyy, hh:mm a').format(order.createdAt!),
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
+  DateFormat('dd-MM-yyyy, hh:mm a')
+      .format(order.createdAt!.add(const Duration(hours: 5, minutes: 30))),
+  style: const TextStyle(color: Colors.grey, fontSize: 12),
+),
+
                 ],
               ),
               // Right Side: Price, Status, and Icon
@@ -54,17 +56,18 @@ class OrderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        order.total.toString(),
+                        '₹ ${order.total}',
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       const SizedBox(height: 5),
                       buildStatusText(order.status ?? 1),
                     ],
                   ),
                   const SizedBox(width: 10),
-                     Icon(Icons.arrow_forward_ios, size: 18),
-                
+                  Icon(Icons.arrow_forward_ios, size: 18),
                 ],
               ),
             ],

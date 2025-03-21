@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:laundry_application/themes.dart';
 import 'package:provider/provider.dart';
 import '../../../components/my_textfield.dart';
 import '../../../utils/api_status.dart';
@@ -195,8 +196,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 text:
                                                     'Terms of Service and Privacy Policy',
                                                 style: TextStyle(
-                                                    color: Color.fromARGB(
-                                                        255, 71, 233, 133),
+                                                    color:
+                                                        AppThemes.primaryColor,
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 15)),
                                           ],
@@ -219,15 +220,13 @@ class _SignupScreenState extends State<SignupScreen> {
                                               },
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            gradient: const LinearGradient(
-                                              colors: [
-                                                Color(
-                                                    0xFFFDC846), // Golden Yellow
-                                                Color(0xFFD32943), // Red
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
+                                            color: viewModel.registerResponse
+                                                        .status ==
+                                                    ApiStatus.loading
+                                                ? Colors
+                                                    .grey // Disabled color when loading
+                                                : AppThemes
+                                                    .primaryColor, // Active button color
                                             borderRadius: BorderRadius.circular(
                                                 8), // Rounded corners
                                           ),

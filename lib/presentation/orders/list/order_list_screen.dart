@@ -29,17 +29,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GradientAppBar(
-        title: "Order List",
-        onBackPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MainScreen(),
-            ),
-          );
-        },
+      appBar: AppBar(
+        title: const Text("Order List"),
+        
       ),
+    
       body: Consumer<OrderListViewModel>(
         builder: (context, viewModel, child) {
           return Column(
@@ -55,8 +49,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   child: Center(
                     child: Text(
                       'No Orders available ',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onBackground),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                 ),

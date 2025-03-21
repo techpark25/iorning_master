@@ -1,29 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:laundry_application/presentation/cart/components/bottom_nav_bar.dart';
+import 'package:laundry_application/themes.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../../data/address/data/address.dart';
+import '../../data/coupons/model/coupon.dart';
 import '../../order_placed.dart';
 import '../../utils/api_status.dart';
 import '../address/address_view_model.dart';
 import '../product/cart_view_model.dart';
+import 'components/cart_list.dart';
 import 'components/location_input.dart';
 import 'components/order_summary.dart';
 import 'components/payment_method_selector.dart';
 import 'components/payment_screen.dart';
 import 'components/pickup_date_selector.dart';
 import 'components/pickup_time_selector.dart';
+import 'coupon/coupon_list_screen.dart';
+import 'coupon/coupon_view_model.dart';
 import 'order_create_view_model.dart';
 import 'razor_pay_service.dart';
 
-class PreviewScreen extends StatefulWidget {
-  const PreviewScreen({super.key});
+class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
 
   @override
-  _PreviewScreenState createState() => _PreviewScreenState();
+  State<CartScreen> createState() => _CartScreenState();
 }
 
-class _PreviewScreenState extends State<PreviewScreen> {
+class _CartScreenState extends State<CartScreen> {
   DateTime selectedDate = DateTime.now();
   String? selectedTime;
   final List<String> availableTimes = [
@@ -34,8 +40,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
     '03:00 pm',
     '04:30 pm',
   ];
+
   final double deliveryFee = 0.0;
-  final double discount = 20.40;
+  double discountAmount = 0.0;
   double totalAmount = 0.0;
   bool isCOD = false;
   bool isOnlinePayment = false;
@@ -61,12 +68,15 @@ class _PreviewScreenState extends State<PreviewScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // cartViewModel.fetchCart();
       addressViewModel.getAddress();
+      addressViewModel.getActiveAddress();
+      await cartViewModel.getCart(); // Ensure cart is updated before order
+      print("Cart Items After Fetch: ${cartViewModel.cartItems.length}");
     });
 
-    totalAmount = cartViewModel.totalPrice! + deliveryFee - discount;
+    totalAmount = cartViewModel.totalPrice + deliveryFee;
   }
 
   @override
@@ -79,12 +89,20 @@ class _PreviewScreenState extends State<PreviewScreen> {
   // Handle payment success
   // Handle payment success
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    Address? activeAddress;
+
+    for (var address in addressViewModel.address) {
+      if (address.activeStatus == 1) {
+        activeAddress = address;
+        break; // Stop the loop once the active address is found
+      }
+    }
     print('Payment Success: ${response.paymentId}');
 
     // Prepare order data
     final pickupLocation = locationController.text;
     final paymentMode = isCOD ? "COD" : "Online";
-    final products = cartViewModel.cartList.data.map((item) {
+    final products = cartViewModel.cartItems.map((item) {
       return {
         'product_id': item.productId,
         'quantity': item.quantity,
@@ -93,10 +111,10 @@ class _PreviewScreenState extends State<PreviewScreen> {
 
     // Call ViewModel to create order after payment success
     await orderCreateViewModel.createOrder(
-      pickupLocation: pickupLocation,
-      paymentMode: paymentMode,
+      pickupLocation: _getFullAddress(activeAddress!),
+      paymentMode: 'Online',
       products: products,
-      timeSlot: selectedTime!,
+      timeSlot: selectedTime ?? '',
       pickupDate: selectedDate.toIso8601String(),
     );
 
@@ -174,178 +192,246 @@ class _PreviewScreenState extends State<PreviewScreen> {
     }
   }
 
-  void handleSubmit() {
-    setState(() {
-      isDateSelected = selectedDate != null;
-      isTimeSelected = selectedTime != null;
-    });
+  void _applyCoupon(Coupon coupon) async {
+    final couponViewModel =
+        Provider.of<CouponViewModel>(context, listen: false);
 
-    if (selectedDate == null || selectedTime == null) {
-      return;
-    }
-    checkout();
-  }
+    await couponViewModel.applyCoupon(
+      couponCode: coupon.code ?? '',
+      cartTotal: cartViewModel.totalPrice,
+    );
 
-  void checkout() async {
-    if (selectedTime != null) {
-      // Prepare order data
-      final pickupLocation = locationController.text;
-      final paymentMode = isCOD ? "COD" : "Online";
-      final products = cartViewModel.cartList.data.map((item) {
-        return {
-          'product_id': item.productId,
-          'quantity': item.quantity,
-        };
-      }).toList(); // Mapping over the cartList's data
+    // Print the API response to verify discount value
+    print("Coupon Response: ${couponViewModel.couponResponse.data?.discount}");
 
-      // Check if the payment is COD
-      if (isCOD) {
-        // Call ViewModel to create order for COD
-        await orderCreateViewModel.createOrder(
-          pickupLocation: pickupLocation,
-          paymentMode: paymentMode,
-          products: products,
-          timeSlot: selectedTime!,
-          pickupDate: selectedDate.toIso8601String(),
-        );
+    if (couponViewModel.couponResponse.status == ApiStatus.success) {
+      setState(() {
+        discountAmount = (couponViewModel.couponResponse.data?.discount ?? 0);
+        totalAmount = cartViewModel.totalPrice - discountAmount;
+      });
 
-        if (orderCreateViewModel.orderResponse?.status == ApiStatus.success) {
-          // If order is successfully created for COD
-          cartViewModel.clearCart();
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const OrderPlaced()),
-            (Route<dynamic> route) => false, // Predicate to remove all routes
-          );
-        } else {
-          // Handle error or show a message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(orderCreateViewModel.errorMessage ??
-                    "Order creation failed")),
-          );
-        }
-      } else if (isOnlinePayment) {
-        // If payment is Online, navigate to the Razorpay Payment Screen
-        _startPayment();
-      }
+      print("Discount Applied: $discountAmount");
+      print("Updated Total Amount: $totalAmount");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Coupon Applied! Discount: ₹$discountAmount")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(couponViewModel.errorMessage)),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final aviewModel = Provider.of<AddressViewModel>(context);
     Address? activeAddress;
 
+    for (var address in aviewModel.address) {
+      if (address.activeStatus == 1) {
+        activeAddress = address;
+        break; // Stop the loop once the active address is found
+      }
+    }
+    final double height = MediaQuery.of(context).size.height;
+    final double bottomHeight = height * 0.22;
     for (var address in addressViewModel.address) {
       if (address.activeStatus == 1) {
         activeAddress = address;
         break; // Stop the loop once the active address is found
       }
     }
-// Typecast the result to Address?
-
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text(
-          'Schedule Appointment',
-          style: TextStyle(color: Colors.black),
+        appBar: AppBar(
+          title: const Text(
+            'Schedule Appointment',
+          ),
+          elevation: 0,
         ),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              PickupDateSelector(
-                selectedDate: selectedDate,
-                onDateSelected: (date) => setState(() {
-                  selectedDate = date;
-                  isDateSelected = true;
-                }),
-              ),
-              if (!isDateSelected)
-                const Text("Please select a date",
-                    style: TextStyle(color: Colors.red)),
-              const SizedBox(height: 20),
-              PickupTimeSelector(
-                selectedTime: selectedTime,
-                onTimeSelected: (time) => setState(() {
-                  selectedTime = time;
-                  isTimeSelected = true;
-                }),
-              ),
-              if (!isTimeSelected)
-                const Text("Please select a time",
-                    style: TextStyle(color: Colors.red)),
-              const SizedBox(height: 20),
-              LocationInput(
-                controller: locationController,
-                address: activeAddress, // Passing the active address or null
-                activeStatus:
-                    activeAddress != null, // Check if activeAddress exists
-              ),
-              const SizedBox(height: 20),
-              PaymentMethodSelector(
-                isCOD: isCOD,
-                isOnlinePayment: isOnlinePayment,
-                onCODChanged: (value) => setState(() {
-                  isCOD = value;
-                  isOnlinePayment = !value;
-                }),
-                onOnlinePaymentChanged: (value) => setState(() {
-                  isOnlinePayment = value;
-                  isCOD = !value;
-                }),
-              ),
-              const SizedBox(height: 20),
-              OrderSummary(
-                itemPrice: cartViewModel.totalPrice.toInt(),
-                deliveryFee: deliveryFee,
-                totalAmount: totalAmount,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed:
-                    isTimeSelected && isDateSelected ? handleSubmit : null,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+        body: Consumer<AddressViewModel>(
+            builder: (context, addressViewModel, child) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PickupDateSelector(
+                    selectedDate: selectedDate,
+                    onDateSelected: (date) => setState(() {
+                      selectedDate = date;
+                      isDateSelected = true;
+                    }),
                   ),
-                  backgroundColor: Colors.white,
-                ),
-                child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0xFFFDC846),
-                        Color(0xFFD32943),
-                      ],
+                  if (!isDateSelected)
+                    const Text("Please select a date",
+                        style: TextStyle(color: Colors.red)),
+                  const SizedBox(height: 20),
+                  PickupTimeSelector(
+                    selectedTime: selectedTime,
+                    onTimeSelected: (time) {
+                      setState(() {
+                        selectedTime = time;
+                      });
+                    },
+                  ),
+                  if (!isTimeSelected)
+                    const Text("Please select a time",
+                        style: TextStyle(color: Colors.red)),
+                  const SizedBox(height: 20),
+                  Consumer<CartViewModel>(
+                    builder: (context, cartViewModel, child) {
+                      return Container(
+                        height:
+                            300, // Set a fixed height to avoid unbounded errors
+                        child: Stack(
+                          children: [
+                            CartList(
+                              cart: cartViewModel.cartItems,
+                              onAddToCart: (productId) {
+                                cartViewModel.addToCart(productId);
+                              },
+                              onRemoveFromCart: (cartId) {
+                                cartViewModel.removeFromCart(cartId);
+                              },
+                            ),
+                            if (cartViewModel.loadingCart)
+                              const Positioned.fill(
+                                child: Center(
+                                  child: SizedBox.shrink(),
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                          10), // Rounded edges for the card
                     ),
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: const Center(
-                    child: Text(
-                      "Place Order",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    elevation: 4, // Adds shadow effect
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Have a coupon?",
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final Coupon? selectedCoupon =
+                                  await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CouponScreen(
+                                      cartTotal: cartViewModel.totalPrice),
+                                ),
+                              );
+
+                              if (selectedCoupon != null) {
+                                _applyCoupon(selectedCoupon);
+                              }
+                            },
+                            child: const Text("Apply Coupon"),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                  Consumer<CartViewModel>(
+                    builder: (context, cartViewModel, child) {
+                      return OrderSummary(
+                        itemPrice: cartViewModel.totalPrice.toInt(),
+                        deliveryFee: deliveryFee,
+                        discount: discountAmount, // Include discount here
+
+                        totalAmount: cartViewModel.totalPrice.toDouble() -
+                            discountAmount,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        }),
+        bottomNavigationBar: Consumer<CartViewModel>(
+          builder: (context, cartViewModel, child) {
+            return BottomNavBar(
+              bottomHeight: bottomHeight,
+              addressList: addressViewModel.address,
+              totalAmount: cartViewModel.totalPrice.toDouble() - discountAmount,
+              isTimeSelected: isTimeSelected,
+              isDateSelected: isDateSelected,
+              onOnlinePayment: _startPayment,
+              onCOD: () async {
+                await cartViewModel.getCart(); // Ensure latest cart data
+                print(
+                    "Cart Items After Fetch: ${cartViewModel.cartItems.length}");
+
+                final products = cartViewModel.cartItems.map((item) {
+                  return {
+                    'product_id': item.productId,
+                    'quantity': item.quantity,
+                  };
+                }).toList();
+
+                await orderCreateViewModel.createOrder(
+                  pickupLocation: _getFullAddress(activeAddress!),
+                  paymentMode: 'COD',
+                  products: products,
+                  timeSlot: selectedTime ?? '',
+                  pickupDate: selectedDate.toIso8601String(),
+                );
+
+                if (orderCreateViewModel.orderResponse?.status ==
+                    ApiStatus.success) {
+                  cartViewModel.clearCart();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const OrderPlaced()),
+                    (Route<dynamic> route) => false,
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(orderCreateViewModel.errorMessage ??
+                          "Order creation failed"),
+                    ),
+                  );
+                }
+              },
+              activeStatus: activeAddress != null,
+              address: activeAddress,
+            );
+          },
+        ));
+  }
+
+  String _getFullAddress(Address address) {
+    List<String> addressParts = [];
+
+    if (address.name != null) addressParts.add(address.name!);
+    if (address.houseOrBuildingNo != null)
+      addressParts.add(address.houseOrBuildingNo!);
+    if (address.addressLine1 != null) addressParts.add(address.addressLine1!);
+    if (address.addressLine2 != null) addressParts.add(address.addressLine2!);
+    if (address.pincode != null)
+      addressParts.add("Pincode: ${address.pincode}");
+    if (address.landmark != null)
+      addressParts.add("Landmark: ${address.landmark}");
+
+    return addressParts.join(', ');
   }
 }

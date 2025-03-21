@@ -20,6 +20,7 @@ class SubCategoriesList extends StatelessWidget {
     final List<Subcategory> allCategories = [
       Subcategory(
         id: 0, // or null if you prefer
+        image: "assets/img/all-category-icon.png",
         name: 'All',
         categoryId: null,
         categoryName: 'All Categories',
@@ -40,11 +41,12 @@ class SubCategoriesList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: CategoryButton(
               subcategory: category,
-              isActive: (activeCategory == null && category.id == 0) || (activeCategory == category.id),
+              isActive: (activeCategory == null && category.id == 0) ||
+                  (activeCategory == category.id),
               onTap: () {
                 // Pass null for "All" selection
                 if (category.id == 0) {
-                  onTap(null);  // This will send null to indicate "All"
+                  onTap(null); // This will send null to indicate "All"
                 } else {
                   onTap(category); // Normal subcategory selection
                 }

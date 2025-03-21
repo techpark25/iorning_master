@@ -2,20 +2,25 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class CarouselImage extends StatelessWidget {
-  const CarouselImage({
-    Key? key,
-    this.imageUrl,
-  }) : super(key: key);
-
   final String? imageUrl;
+
+  const CarouselImage({Key? key, this.imageUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return imageUrl != null
-        ? CachedNetworkImage(
-            imageUrl: imageUrl!,
-            fit: BoxFit.fill,
-          )
-        : Container(color: Colors.grey);
+    return CachedNetworkImage(
+      imageUrl: imageUrl ??
+          'https://via.placeholder.com/800x400?text=No+Image', // Fallback image
+      fit: BoxFit.cover,
+      placeholder: (context, url) => Container(
+        color: Colors.black12, // Light background while loading
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+      errorWidget: (context, url, error) => Container(
+        color: Colors.grey.shade300,
+        child:
+            const Icon(Icons.broken_image, size: 50, color: Colors.redAccent),
+      ),
+    );
   }
 }

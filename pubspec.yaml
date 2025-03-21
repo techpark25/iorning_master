@@ -48,6 +48,7 @@ dependencies:
   google_maps_flutter: ^2.10.0
   geocoding: ^3.0.0
   flutter_dotenv: ^5.2.1
+  url_launcher: ^6.1.14
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +97,8 @@ flutter:
      - assets/img/resetpasswrod-bg.webp
      - assets/img/animation-confirm.json
      - assets/.env
+     - assets/img/ironing-master-new-logo.png
+     - assets/img/all-category-icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

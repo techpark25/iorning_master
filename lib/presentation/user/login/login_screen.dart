@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:laundry_application/themes.dart';
 import 'package:provider/provider.dart';
 
 import '../../../components/my_textfield.dart';
@@ -80,12 +81,14 @@ class _LoginScreenState extends State<LoginScreen> {
               viewModel.reset();
             },
           );
-        }   if (viewModel.loginResponse.status == ApiStatus.error) {
-            Future.microtask(() {
-              _showSnackbar(viewModel.errorMessage ?? 'An unexpected error occurred.');
-              viewModel.reset();
-            });
-          }
+        }
+        if (viewModel.loginResponse.status == ApiStatus.error) {
+          Future.microtask(() {
+            _showSnackbar(
+                viewModel.errorMessage ?? 'An unexpected error occurred.');
+            viewModel.reset();
+          });
+        }
         return SingleChildScrollView(
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
@@ -160,21 +163,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                           },
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color(0xFFFDC846), // Golden Yellow
-                                            Color(0xFFD32943), // Red
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
+                                        color: viewModel.loginResponse.status ==
+                                                ApiStatus.loading
+                                            ? Colors
+                                                .grey // Disabled color when loading
+                                            : AppThemes
+                                                .primaryColor, // Active button color
                                         borderRadius: BorderRadius.circular(
                                             8), // Rounded corners
                                       ),
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 12, horizontal: 24),
                                       alignment: Alignment.center,
-                                      child: const Text(
+                                      child: Text(
                                         "Login",
                                         style: TextStyle(
                                           color: Colors.white, // Text color
@@ -205,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       textAlign: TextAlign.start,
                                     ),
                                   ),
-                                   GestureDetector(
+                                  GestureDetector(
                                     onTap: () {
                                       // Navigate to Signup page when clicked
                                       Navigator.push(

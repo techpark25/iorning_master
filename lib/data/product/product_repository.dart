@@ -12,7 +12,6 @@ class ProductRepository {
     try {
       String url = '/subcategories?category_id=$categoryId';
       
-      // If subcategoryId is not null, add it to the URL; otherwise, omit it or set to 0
       if (subcategoryId != null && subcategoryId != 0) {
         url += '&subcategory_id=$subcategoryId';
       }

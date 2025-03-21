@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:laundry_application/themes.dart';
+import '../cart/cart_screen.dart';
 import '../home/home_screen.dart';
 import '../../Schedule.dart';
 import '../orders/list/order_list_screen.dart';
@@ -18,10 +20,9 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     const HomeScreen(),
-    // const ProductsPage(),
+    CartScreen(),
     const OrderListScreen(),
     const ProfileScreen(),
-    const Schedule(),
   ];
 
   @override
@@ -32,14 +33,7 @@ class _MainScreenState extends State<MainScreen> {
       // Wrap the CurvedNavigationBar with a Container to show gradient
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFFDC846), // Golden Yellow
-              Color(0xFFD32943), // Red
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: AppThemes.primaryColor,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(50),
             topRight: Radius.circular(50),
@@ -54,7 +48,8 @@ class _MainScreenState extends State<MainScreen> {
           items: <Widget>[
             _buildIcon(Icons.home, 0),
             _buildIcon(Icons.shopping_basket, 1),
-            _buildIcon(Icons.person, 2),
+            _buildIcon(Icons.delivery_dining, 2),
+            _buildIcon(Icons.person, 3),
           ],
           onTap: (index) {
             setState(() {
@@ -67,7 +62,7 @@ class _MainScreenState extends State<MainScreen> {
       body: Column(
         children: [
           // Header Section
-        
+
           // Page Content
           Expanded(
             child: _pages[_pageIndex],
@@ -87,7 +82,7 @@ class _MainScreenState extends State<MainScreen> {
         shape: BoxShape.circle,
 
         color: _pageIndex == index
-            ? const Color.fromARGB(255, 255, 145, 0) // Active background color
+            ? AppThemes.primaryColor // Active background color
             : Colors.transparent, // Transparent for non-active
       ),
       child: Center(
@@ -95,9 +90,8 @@ class _MainScreenState extends State<MainScreen> {
           icon,
           size: _pageIndex == index ? 28 : 30, // Adjust size for active state
           color: _pageIndex == index
-              ? const Color.fromARGB(
-                  255, 255, 255, 255) // Icon color for active
-              : Colors.white, // Icon color for non-active
+              ? AppThemes.backgroundColor // Icon color for active
+              : AppThemes.backgroundColor, // Icon color for non-active
         ),
       ),
     );

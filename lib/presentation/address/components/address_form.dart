@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:laundry_application/themes.dart';
 
-class AddressForm extends StatelessWidget {
+class AddressForm extends StatefulWidget {
   final TextEditingController nameController;
   final TextEditingController houseNoController;
   final TextEditingController addressLine1Controller;
@@ -24,6 +25,11 @@ class AddressForm extends StatelessWidget {
     required this.pincodeController,
   });
 
+  @override
+  _AddressFormState createState() => _AddressFormState();
+}
+
+class _AddressFormState extends State<AddressForm> {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -46,24 +52,30 @@ class AddressForm extends StatelessWidget {
                   style: Theme.of(context)
                       .textTheme
                       .headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                      ?.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 const SizedBox(height: 8),
-                _buildTextField(nameController, 'Full Name', Icons.person),
                 _buildTextField(
-                    houseNoController, 'House/Building No', Icons.home),
-                _buildTextField(addressLine1Controller, 'Address Line 1',
+                    widget.nameController, 'Full Name', Icons.person),
+                _buildTextField(
+                    widget.houseNoController, 'House/Building No', Icons.home),
+                _buildTextField(widget.addressLine1Controller, 'Address Line 1',
                     Icons.location_on),
-                _buildTextField(addressLine2Controller, 'Address Line 2',
+                _buildTextField(widget.addressLine2Controller, 'Address Line 2',
                     Icons.location_on),
-                _buildTextField(landmarkController, 'Landmark', Icons.map),
-                _buildTextField(pincodeController, 'Pincode', Icons.pin_drop),
+                _buildTextField(
+                    widget.landmarkController, 'Landmark', Icons.map),
+                _buildTextField(
+                    widget.pincodeController, 'Pincode', Icons.pin_drop),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: onTap,
-                    icon: const Icon(Icons.save),
+                    onPressed: widget.onTap,
+                    icon: const Icon(
+                      Icons.save,
+                      color: AppThemes.backgroundColor,
+                    ),
                     label: const Text("Save Address"),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -86,10 +98,26 @@ class AddressForm extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
         controller: controller,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          prefixIcon: Icon(
+            icon,
+            size: 17,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: const Color.fromARGB(255, 213, 213, 213),
+                width: 1.0), // Default border color
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: const Color.fromARGB(255, 178, 178, 178),
+                width: 1.0), // Border color when focused
+            borderRadius: BorderRadius.circular(8.0),
+          ),
         ),
         validator: (value) {
           if (value == null || value.trim().isEmpty) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laundry_application/presentation/orders/detail/order_detail_view_model.dart';
+import 'order_detail_view_model.dart';
 import 'package:provider/provider.dart';
 
 import 'components/detail_card.dart';
@@ -28,24 +28,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Sample values for demonstration
-   
-
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFDC846),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFFDC846), // Golden Yellow
-                Color(0xFFD32943), // Red
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        
         title: const Text(
           "Order Details",
           style: TextStyle(color: Colors.white),
@@ -59,6 +44,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       ),
       body: Consumer<OrderDetailViewModel>(
         builder: (context, viewModel, child) {
+          if (viewModel.loadingOrders){
+            return const Center(child: CircularProgressIndicator());
+          }
            if (viewModel.orderDetail?.orders == null) {
           return const Center(
             child: Text("No order details available"),
@@ -92,7 +80,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 }
  Widget _buildDetailRow(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

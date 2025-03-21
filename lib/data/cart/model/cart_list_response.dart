@@ -1,3 +1,5 @@
+import '../../product/model/product.dart';
+
 class CartListResponse {
   CartListResponse({
     required this.data,
@@ -40,10 +42,10 @@ class Cart {
   final int? id;
   final int? userId;
   final int? productId;
-    int? quantity;
+  int? quantity;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final CartProduct? product;
+  final Product? product;
 
   factory Cart.fromJson(Map<String, dynamic> json) {
     return Cart(
@@ -54,7 +56,7 @@ class Cart {
       createdAt: DateTime.tryParse(json["created_at"] ?? ""),
       updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
       product:
-          json["product"] == null ? null : CartProduct.fromJson(json["product"]),
+          json["product"] == null ? null : Product.fromJson(json["product"]),
     );
   }
 
@@ -66,47 +68,5 @@ class Cart {
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
         "product": product?.toJson(),
-      };
-}
-
-class CartProduct {
-  CartProduct({
-    required this.id,
-    required this.name,
-    required this.price,
-    required this.image,
-    required this.subcategoryId,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  final int? id;
-  final String? name;
-  final String? price;
-  final String? image;
-  final int? subcategoryId;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
-  factory CartProduct.fromJson(Map<String, dynamic> json) {
-    return CartProduct(
-      id: json["id"],
-      name: json["name"],
-      price: json["price"],
-      image: json["image"],
-      subcategoryId: json["subcategory_id"],
-      createdAt: DateTime.tryParse(json["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(json["updated_at"] ?? ""),
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "price": price,
-        "image": image,
-        "subcategory_id": subcategoryId,
-        "created_at": createdAt?.toIso8601String(),
-        "updated_at": updatedAt?.toIso8601String(),
       };
 }

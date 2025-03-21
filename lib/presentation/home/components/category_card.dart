@@ -9,7 +9,8 @@ class CategoryCard extends StatelessWidget {
   const CategoryCard({
     super.key,
     required this.serviceName,
-    this.backgroundImageUrl, this.onTap,
+    this.backgroundImageUrl,
+    this.onTap,
   });
 
   @override
@@ -23,11 +24,13 @@ class CategoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.0),
           image: backgroundImageUrl != null
               ? DecorationImage(
-                  image: CachedNetworkImageProvider(backgroundImageUrl!),
+                  image: CachedNetworkImageProvider(
+                      maxWidth: 250, maxHeight: 90, backgroundImageUrl!),
                   fit: BoxFit.cover,
                 )
               : null, // No image if URL is null
-          color: backgroundImageUrl == null ? Colors.grey : null, // Fallback color
+          color:
+              backgroundImageUrl == null ? Colors.grey : null, // Fallback color
         ),
         child: Container(
           decoration: BoxDecoration(

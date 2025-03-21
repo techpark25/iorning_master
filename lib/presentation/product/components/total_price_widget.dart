@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laundry_application/themes.dart';
 
 class TotalPriceWidget extends StatelessWidget {
   final int totalQuantity;
@@ -13,9 +14,11 @@ class TotalPriceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20.0),
+      margin: const EdgeInsets.symmetric(vertical: 00, horizontal: 20),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(141, 0, 0, 0),
+        border: Border.all(
+            color: const Color.fromARGB(255, 255, 153, 155), width: 1),
+        color: AppThemes.lightSucessColor,
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: Padding(
@@ -25,11 +28,17 @@ class TotalPriceWidget extends StatelessWidget {
           children: [
             Text(
               'Total Price: ( $totalQuantity items) ',
-              style: const TextStyle(fontSize: 10, color: Colors.white),
+              style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: AppThemes.darkBackgroundColor),
             ),
             Text(
               'Total Price: ₹$totalPrice',
-              style: const TextStyle(fontSize: 16, color: Colors.white),
+              style: const TextStyle(
+                  fontSize: 16,
+                  color: AppThemes.darkBackgroundColor,
+                  fontWeight: FontWeight.w600),
             ),
           ],
         ),

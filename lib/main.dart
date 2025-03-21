@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:laundry_application/themes.dart';
 
 import 'package:provider/provider.dart';
 
@@ -22,8 +23,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [...viewmodelProviders],
       child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(),
+        title: 'Ironing Master',
+        theme: AppThemes.lightTheme,
         home: const SplashScreen(),
         debugShowCheckedModeBanner: false,
         initialRoute: RouteGenerator.initialRoute,

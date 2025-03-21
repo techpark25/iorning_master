@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:laundry_application/data/orders/model/order_detail_response.dart';
+
+import '../../../data/orders/model/order_detail_response.dart';
 import '../../../data/orders/order_repository.dart';
 import '../../../utils/api_status.dart';
 

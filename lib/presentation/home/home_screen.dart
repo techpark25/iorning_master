@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 import '../../data/address/data/address.dart';
+import '../../themes.dart';
 import '../address/location_search_screen.dart';
 import 'components/carousel_view.dart';
 import 'components/category_list.dart';
@@ -33,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     aviewModel = Provider.of<AddressViewModel>(context, listen: false);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      viewModel.getCategories();
+      viewModel.getMenus();
       viewModel.getCarouselImages();
       viewModel.getUser();
       aviewModel.getActiveAddress();
@@ -47,38 +48,49 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    LocationPermission permission = await Geolocator.checkPermission();
+  if (!mounted) return; // Ensure widget is still in the tree
 
-    if (!serviceEnabled || permission == LocationPermission.denied) {
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  LocationPermission permission = await Geolocator.checkPermission();
+
+  if (!serviceEnabled || permission == LocationPermission.denied) {
+    if (mounted) {
       _showPermissionBottomSheet(); // Show bottom sheet if permission is not granted
-      return;
     }
+    return;
+  }
 
-    if (permission == LocationPermission.deniedForever) {
+  if (permission == LocationPermission.deniedForever) {
+    if (mounted) {
       setState(() {
         _currentLocation = 'Location permission permanently denied';
       });
-      return;
     }
+    return;
+  }
 
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+  Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
 
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
+  List<Placemark> placemarks =
+      await placemarkFromCoordinates(position.latitude, position.longitude);
 
-    if (placemarks.isNotEmpty) {
+  if (placemarks.isNotEmpty) {
+    if (mounted) {
       setState(() {
         _currentLocation =
-            '${placemarks.first.street}, ${placemarks.first.locality},${placemarks.first.administrativeArea},${placemarks.first.postalCode}, ${placemarks.first.country}';
+            '${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}, ${placemarks.first.postalCode}, ${placemarks.first.country}';
       });
-    } else {
+    }
+  } else {
+    if (mounted) {
       setState(() {
-        _currentLocation = 'Address not available';
+        _currentLocation = '';
       });
     }
   }
+}
+
 
   void _showPermissionBottomSheet() {
     showModalBottomSheet(
@@ -121,11 +133,16 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+@override
+void dispose() {
+  super.dispose();
+  // Cancel any active location requests or listeners here
+}
 
   @override
   Widget build(BuildContext context) {
     final aviewModel = Provider.of<AddressViewModel>(context);
- Address? activeAddress;
+    Address? activeAddress;
 
     for (var address in aviewModel.address) {
       if (address.activeStatus == 1) {
@@ -149,28 +166,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Icon(
                     Icons.location_on,
-                    color: Colors.red,
-                    size: 18,
+                    color: AppThemes.backgroundColor,
+                    size: 15,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     aviewModel.address.isNotEmpty
                         ? _capitalizeFirstLetter(
-                            activeAddress?.name ??
-                                'Address not available')
+                            activeAddress?.name ?? '')
                         : 'Getting current location...',
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppThemes.backgroundColor,
                     ),
                   ),
                   const SizedBox(width: 8),
                   const Icon(
                     Icons.keyboard_arrow_down,
-                    color: Colors.black,
-                    size: 24,
+                    color: AppThemes.backgroundColor,
+                    size: 15,
                   ),
                 ],
               ),
@@ -181,8 +197,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     : 'Address not available, $_currentLocation',
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.blue,
+                  fontSize: 10,
+                  color: AppThemes.backgroundColor,
                   fontWeight: FontWeight.w400,
                 ),
               )
@@ -194,85 +210,114 @@ class _HomeScreenState extends State<HomeScreen> {
         return SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.only(
-                    left: 20, right: 20, top: 20, bottom: 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Hi, ${viewModel.user?.name ?? ''}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        const Text(
-                          'Good Morning!',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
+              // Container(
+              //   padding: const EdgeInsets.only(
+              //       left: 20, right: 20, top: 20, bottom: 0),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Column(
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           Text(
+              //             'Hi, ${viewModel.user?.name ?? ''}',
+              //             style: const TextStyle(
+              //               fontSize: 20,
+              //               fontWeight: FontWeight.bold,
+              //             ),
+              //           ),
+              //           const SizedBox(height: 5),
+              //           const Text(
+              //             'Good Morning!',
+              //             style: TextStyle(
+              //               fontSize: 14,
+              //               color: Colors.grey,
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 20),
               CarouselVieww(
                 images: viewModel.carouselImages,
                 isLoading: viewModel.loadingCarouselImages,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
               // Services Offered Title
-              const Center(
-                child: Text(
-                  "Services Offered",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
+              // const Center(
+              //   child: Text(
+              //     "Services Offered",
+              //     style: TextStyle(
+              //       fontSize: 16,
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //   ),
+              // ),
               CategoryList(
-                categories: viewModel.categories,
+                categories: viewModel.menus,
                 subcategories: pviewModel.subcategories,
               ),
 
-              const SizedBox(height: 20),
-
-              // Steps Section Title
-              const Center(
-                child: Text(
-                  "Steps to Get Started",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+              Container(
+                width: double.infinity, // Full width // Add padding for spacing
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                        "assets/img/resetpasswrod-bg.webp"), // Background image
+                    fit: BoxFit.cover, // Cover the full container
                   ),
                 ),
+                child: Stack(
+                  children: [
+                    // Black Overlay Effect - Positioned.fill ensures it covers the whole container
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.black
+                            .withOpacity(0.6), // Adjust opacity for darkness
+                      ),
+                    ),
+
+                    // Content Section (Wrapped in a Column)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20, bottom: 20),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Center(
+                            child: Text(
+                              "Steps to Get Started",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors
+                                    .white, // Set text color to white for contrast
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Steps Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildStepCircle(
+                                  Icons.check, "Step 1", "Select Service"),
+                              _buildStepCircle(
+                                  Icons.check, "Step 2", "Select Product"),
+                              _buildStepCircle(
+                                  Icons.check, "Step 3", "Get Relax"),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-
-              const SizedBox(height: 20),
-
-              // Steps Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildStepCircle(Icons.check, "Step 1", "Select Service"),
-                  _buildStepCircle(Icons.check, "Step 2", "Select Product"),
-                  _buildStepCircle(Icons.check, "Step 3", "Get Relax"),
-                ],
-              ),
-
               const SizedBox(height: 20),
             ],
           ),
@@ -288,14 +333,13 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            border: Border.all(
-                color: const Color.fromARGB(255, 255, 157, 0), width: 3),
+            border: Border.all(color: AppThemes.backgroundColor, width: 3),
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Icon(
               icon,
-              color: const Color.fromARGB(255, 255, 157, 0),
+              color: AppThemes.backgroundColor,
               size: 20.0,
             ),
           ),
@@ -306,6 +350,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
+            color: AppThemes.backgroundColor,
           ),
         ),
         const SizedBox(height: 4),
@@ -313,7 +358,7 @@ class _HomeScreenState extends State<HomeScreen> {
           description,
           style: const TextStyle(
             fontSize: 12,
-            color: Colors.grey,
+            color: AppThemes.backgroundColor,
           ),
         ),
       ],

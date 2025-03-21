@@ -108,6 +108,10 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Search for a location',
+                  hintStyle: TextStyle(
+                      fontSize: 16,
+                      color: const Color.fromARGB(255, 65, 65, 65),
+                      fontWeight: FontWeight.w500),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.search),
                     onPressed: () {
@@ -116,6 +120,18 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 172, 172, 172),
+                        width: 1.0), // Default border color
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 121, 121, 121),
+                        width: 1.0), // Border color when focused
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
                 onChanged: (query) {
@@ -181,7 +197,8 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
                             ? null
                             : () async {
                                 await viewModel.updateStatus(address.id ?? 0);
-                                        await viewModel.getAddress();  // This should repull the addresses after the status change
+                                await viewModel
+                                    .getAddress(); // This should repull the addresses after the status change
 
                                 // Ensure the UI is rebuilt after the status update
                               },

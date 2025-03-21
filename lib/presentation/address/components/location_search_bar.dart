@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laundry_application/themes.dart';
 
 import '../location_search_screen.dart';
 
@@ -15,7 +16,9 @@ class LocationSearchBar extends StatelessWidget {
           MaterialPageRoute(builder: (context) => const LocationSearchScreen()),
         ),
         decoration: InputDecoration(
+          fillColor: AppThemes.backgroundColor,
           hintText: 'Search for a location',
+          hintStyle: TextStyle(fontSize: 16),
           suffixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),

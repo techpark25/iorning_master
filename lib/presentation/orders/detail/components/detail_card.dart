@@ -36,9 +36,16 @@ class DetailCard extends StatelessWidget {
           _buildDetailRow('Order ID', "#${details.orderRefNum}"),
           _buildDetailRow(
             'Date and Time',
-            DateFormat('dd-mm-yyyy, hh:mm a').format(details.createdAt!),
+            DateFormat('dd-MM-yyyy, hh:mm a').format(
+              details.createdAt!.add(const Duration(hours: 5, minutes: 30)),
+            ),
           ),
           _buildDetailRow('Order Location', details.pickupLocation ?? "N/A"),
+          _buildDetailRow(
+            'Pickup Date',
+            DateFormat('dd-MM-yyyy').format(details.pickupDate!),
+          ),
+          _buildDetailRow('Pickup Time', details.timeSlot.toString()),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -62,15 +69,19 @@ class DetailCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
           ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 14),
+            ),
           ),
         ],
       ),

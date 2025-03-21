@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:laundry_application/presentation/address/location_search_screen.dart';
+import 'package:laundry_application/presentation/notifications/list/notification_screen.dart';
+import 'package:laundry_application/presentation/orders/list/order_list_screen.dart';
+import 'package:laundry_application/presentation/profile/utils.dart';
+import 'package:laundry_application/themes.dart';
+import 'package:laundry_application/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 import '../user/login/login_screen.dart';
@@ -21,6 +27,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       viewModel.getUser();
     });
+  }
+
+  void _showSupportDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          title: const Text(
+            'Help & Support',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            textAlign: TextAlign.center,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'For assistance, call us at:',
+                style: TextStyle(fontSize: 16.0),
+              ),
+              const SizedBox(height: 10.0),
+              GestureDetector(
+                onTap: () {
+                  Utils.makePhoneCall(
+                      '9876543210'); // Replace with actual number
+                },
+                child: const Text(
+                  '9876543210', // Replace with actual support number
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: AppThemes.primaryColor,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // actions: [
+          //   TextButton(
+          //     onPressed: () {
+          //       Navigator.pop(context);
+          //     },
+          //     child: const Text(
+          //       'Close',
+          //       style: TextStyle(color: AppThemes.primaryColor),
+          //     ),
+          //   ),
+          // ],
+        );
+      },
+    );
   }
 
   void _handleLogout() {
@@ -85,27 +145,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title:
-            const Text('User Profile', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFFDC846), // Golden Yellow
-                Color(0xFFD32943), // Red
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+        appBar: AppBar(
+          title:
+              const Text('User Profile', style: TextStyle(color: Colors.white)),
+          elevation: 0,
         ),
-      ),
-      body:Consumer<ProfileViewModel>(
-        builder: (context, viewModel, _) {
-        
+        body: Consumer<ProfileViewModel>(builder: (context, viewModel, _) {
           if (viewModel.isLoadingUser) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -117,117 +162,141 @@ class _ProfileScreenState extends State<ProfileScreen> {
           //   );
           // }
           return Column(
-        children: [
-          // Profile Image and Username Section
-          Container(
-            padding: const EdgeInsets.all(20.0),
-            child:  Column(
-              children: [
-                const CircleAvatar(
-                  radius: 50.0,
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.black,
-                  ), // Replace with your profile image
-                ),
-                const SizedBox(height: 10.0),
-                 Text(
-                  viewModel.user?.name ?? '', // Replace with the username
-                  style: const TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5.0),
-                Text(
-                  viewModel.user?.email ?? '', // Replace with user email or description
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const Divider(height: 1.0, thickness: 1.0),
-
-          // Menu Options
-          Expanded(
-            child: ListView(
-              children: [
-                _buildMenuItem(
-                  context,
-                  icon: Icons.person,
-                  title: 'Profile',
-                  onTap: () {
-                    // Navigate to Profile Page
-                    print('Profile clicked');
-                  },
-                ),
-                // _buildMenuItem(
-                //   context,
-                //   icon: Icons.shopping_bag,
-                //   title: 'Order Details',
-                //   onTap: () {
-                //     // Navigate to Order Details Page
-                //     print('Order Details clicked');
-                //   },
-                // ),
-                // _buildMenuItem(
-                //   context,
-                //   icon: Icons.miscellaneous_services,
-                //   title: 'Service',
-                //   onTap: () {
-                //     // Navigate to Services Page
-                //     print('Service clicked');
-                //   },
-                // ),
-              ],
-            ),
-          ),
-
-          const Divider(height: 1.0, thickness: 1.0),
-
-          // Logout Button at the Bottom
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent, // Transparent background
-                shadowColor: Colors.transparent, // Remove shadow
-                padding: EdgeInsets.zero, // No padding to fit the gradient
-              ),
-              onPressed: _handleLogout,
-              child: Ink(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color.fromARGB(255, 228, 228, 228), // Red
-                      Color.fromARGB(255, 228, 228, 228), // Golden Yellow
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(8.0), // Rounded corners
-                ),
-                child: Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 15.0),
-                  child: const Text(
-                    'Logout',
-                    style: TextStyle(
+            children: [
+              // Profile Image and Username Section
+              Container(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    const CircleAvatar(
+                      radius: 30.0,
+                      child: Icon(
+                        Icons.person,
                         color: Colors.black,
-                        fontSize: 16.0), // Text color for the button
+                      ), // Replace with your profile image
+                    ),
+                    const SizedBox(height: 10.0),
+                    Text(
+                      MyAppDateUtils.capitalizeFirstLetter(
+                          viewModel.user?.name ??
+                              ''), // Replace with the username
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2.0),
+                    Text(
+                      viewModel.user?.email ??
+                          '', // Replace with user email or description
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              const Divider(height: 1.0, thickness: 1.0),
+
+              // Menu Options
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.delivery_dining,
+                      title: 'Orders',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const OrderListScreen()), // Navigate to Signup page
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.location_city,
+                      title: 'Address',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const LocationSearchScreen()), // Navigate to Signup page
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.notifications,
+                      title: 'Notifications',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const NotificationScreen()), // Navigate to Signup page
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.support_agent,
+                      title: 'Help & Support',
+                      onTap: () {
+                        _showSupportDialog();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Logout Button at the Bottom
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 50.0, horizontal: 20),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.transparent, // Transparent background
+                    shadowColor: Colors.transparent, // Remove shadow
+                    padding: EdgeInsets.zero, // No padding to fit the gradient
+                  ),
+                  onPressed: _handleLogout,
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color.fromARGB(255, 228, 228, 228), // Red
+                          Color.fromARGB(255, 228, 228, 228), // Golden Yellow
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(8.0), // Rounded corners
+                    ),
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 15.0),
+                      child: const Text(
+                        'Logout',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16.0), // Text color for the button
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ],
-      );
-  }));
+            ],
+          );
+        }));
   }
 
   // Helper Method to Create Menu Items

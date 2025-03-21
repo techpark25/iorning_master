@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laundry_application/themes.dart';
 import 'order_placed.dart';
 
 class Schedule extends StatefulWidget {
@@ -94,15 +95,9 @@ class _ScheduleState extends State<Schedule> {
                     width: 50,
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      gradient: isSelected
-                          ? const LinearGradient(
-                              colors: [
-                                Color(0xFFFDC846),
-                                Color(0xFFD32943),
-                              ],
-                            )
-                          : null,
-                      color: isSelected ? null : Colors.grey[200],
+                      color: isSelected
+                          ? AppThemes.primaryColor
+                          : Colors.grey[200],
                       shape: BoxShape.circle,
                     ),
                     child: Column(

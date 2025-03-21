@@ -54,7 +54,7 @@ class _ProductScreenState extends State<ProductScreen> {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 4),
+              const SizedBox(height: 20),
               Center(
                 child: SubCategoriesList(
                   categories: viewModel.subcategories,
@@ -86,28 +86,33 @@ class _ProductScreenState extends State<ProductScreen> {
                   ),
                 ),
               ] else ...[
-                Expanded(
-                  child: Consumer<CartViewModel>(
-                    builder: (context, cartViewModel, child) {
-                      if (cartViewModel.loadingCart) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      return ProductList(
-                        products: viewModel.products,
-                        cart: cartViewModel.cartItems,
-                        onAddToCart: (productId) {
-                          cartViewModel.addToCart(productId);
-                        },
-                        onRemoveFromCart: (cartId) {
-                          cartViewModel.removeFromCart(cartId);
-                          print(cartId);
-                        },
-                      );
-                    },
-                  ),
-                ),
+                Expanded(child: Consumer<CartViewModel>(
+                  builder: (context, cartViewModel, child) {
+                    return Stack(
+                      children: [
+                        ProductList(
+                          products: viewModel.products,
+                          cart: cartViewModel.cartItems,
+                          onAddToCart: (productId) {
+                            cartViewModel.addToCart(productId);
+                          },
+                          onRemoveFromCart: (cartId) {
+                            cartViewModel.removeFromCart(cartId);
+                          },
+                        ),
+                        if (cartViewModel.loadingCart)
+                          Positioned.fill(
+                            child: Container(
+                              // Semi-transparent overlay
+                              child: const Center(
+                                child: SizedBox.shrink(),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ))
               ],
               Consumer<CartViewModel>(
                 builder: (context, cartViewModel, child) {

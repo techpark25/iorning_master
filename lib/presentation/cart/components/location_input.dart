@@ -27,7 +27,8 @@ class LocationInput extends StatelessWidget {
       children: [
         const Text(
           "Add Location",
-          style: TextStyle(fontSize: 18, color: Colors.black),
+          style: TextStyle(
+              fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 10),
         TextField(

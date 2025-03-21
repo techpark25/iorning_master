@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laundry_application/themes.dart';
 import 'package:provider/provider.dart';
 import '../../SplashScreen2.dart';
 import 'splash_view_model.dart'; // Import the second splash screen.
@@ -23,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Customize the background color
+      backgroundColor: AppThemes.primaryColor, // Customize the background color
       body: Consumer<SplashViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.redirectTo != null) {
@@ -42,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset("assets/img/logo.png",
+                Image.asset("assets/img/ironing-master-new-logo.png",
                     width: 100, height: 100), // Add your logo
                 const SizedBox(height: 20),
                 // const Text(

@@ -1,8 +1,10 @@
 import 'package:provider/provider.dart';
 
 import 'presentation/address/address_view_model.dart';
+import 'presentation/cart/coupon/coupon_view_model.dart';
 import 'presentation/cart/order_create_view_model.dart';
 import 'presentation/home/home_view_model.dart';
+import 'presentation/notifications/list/notification_list_view_model.dart';
 import 'presentation/orders/detail/order_detail_view_model.dart';
 import 'presentation/orders/list/order_list_view_model.dart';
 import 'presentation/product/cart_view_model.dart';
@@ -24,4 +26,6 @@ List viewmodelProviders = [
   ChangeNotifierProvider(create: (_) => CartViewModel()),
   ChangeNotifierProvider(create: (_) => OrderCreateViewModel()),
   ChangeNotifierProvider(create: (_) => AddressViewModel()),
+  ChangeNotifierProvider(create: (_) => NotificationListViewModel()),
+  ChangeNotifierProvider(create: (_) => CouponViewModel()),
 ];

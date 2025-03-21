@@ -18,31 +18,24 @@ class UserRepository {
     try {
       final dio = await DioWrapper().getDio();
       Response response = await dio.post('/signup', data: reqData);
-      if (response.statusCode == 200) {
-        final registerResponse = RegisterResponse.fromJson(response.data);
-        print("Register response: ${response.data}");
-        
-        if (registerResponse.data?.token != null) {
-          await saveApiAccessToken(registerResponse.data!.token!);
-          if (registerResponse.data?.user != null) {
-            await saveUserProfile(registerResponse.data!.user!);
-          } else {
-            return ApiResponse.error(
-              null,
-              registerResponse.message ?? 'Failed to save user profile.',
-            );
-          }
-          return ApiResponse.success(registerResponse);
+      final registerResponse = RegisterResponse.fromJson(response.data);
+      print("Register response: ${response.data}");
+
+      if (registerResponse.data?.token != null) {
+        await saveApiAccessToken(registerResponse.data!.token!);
+        if (registerResponse.data?.user != null) {
+          await saveUserProfile(registerResponse.data!.user!);
         } else {
           return ApiResponse.error(
             null,
-            registerResponse.message ?? 'Token is missing. Please try again.',
+            registerResponse.message ?? 'Failed to save user profile.',
           );
         }
+        return ApiResponse.success(registerResponse);
       } else {
         return ApiResponse.error(
           null,
-          'Failed to register, Server error ${response.statusCode}',
+          registerResponse.message ?? 'Token is missing. Please try again.',
         );
       }
     } on DioException catch (e) {
@@ -51,37 +44,36 @@ class UserRepository {
   }
 
   Future<ApiResponse<LoginResponse?>> login(
-    String email, String password) async {
-  final reqData = {'email': email, 'password': password};
-  try {
-    final dio = await DioWrapper().getDio();
-    Response response = await dio.post('/login', data: reqData);
-    if (response.statusCode == 200) {
-      final loginResponse = LoginResponse.fromJson(response.data);
-      print("Login response: ${response.data}");
+      String email, String password) async {
+    final reqData = {'email': email, 'password': password};
+    try {
+      final dio = await DioWrapper().getDio();
+      Response response = await dio.post('/login', data: reqData);
+      if (response.statusCode == 200) {
+        final loginResponse = LoginResponse.fromJson(response.data);
+        print("Login response: ${response.data}");
 
-      if (loginResponse.token != null && loginResponse.user != null) {
-        print("User data before saving: ${loginResponse.user?.toJson()}");
-        await saveApiAccessToken(loginResponse.token!);
-        await saveUserProfile(loginResponse.user!); // Save user profile here
-        return ApiResponse.success(loginResponse);
+        if (loginResponse.token != null && loginResponse.user != null) {
+          print("User data before saving: ${loginResponse.user?.toJson()}");
+          await saveApiAccessToken(loginResponse.token!);
+          await saveUserProfile(loginResponse.user!); // Save user profile here
+          return ApiResponse.success(loginResponse);
+        } else {
+          return ApiResponse.error(
+            null,
+            loginResponse.message ?? 'Login failed. Please try again.',
+          );
+        }
       } else {
         return ApiResponse.error(
           null,
-          loginResponse.message ?? 'Login failed. Please try again.',
+          'Login failed, Server error ${response.statusCode}',
         );
       }
-    } else {
-      return ApiResponse.error(
-        null,
-        'Login failed, Server error ${response.statusCode}',
-      );
+    } on DioException catch (e) {
+      return ApiResponse.error(e, "Invalid credentials. Please try again.");
     }
-  } on DioException catch (e) {
-    return ApiResponse.error(e, "Invalid credentials. Please try again.");
   }
-}
-
 
   Future<ApiResponse<User?>> getProfile() async {
     try {
@@ -132,7 +124,7 @@ class UserRepository {
   Future<void> saveUserProfile(User user) async {
     final preferences = await SharedPreferences.getInstance();
     final userJson = jsonEncode(user.toJson());
-    print("Saving user profile: $userJson");  // Log saved data
+    print("Saving user profile: $userJson"); // Log saved data
     await preferences.setString(_prefKeyProfile, userJson);
 
     // Verify if data is saved correctly
@@ -142,7 +134,7 @@ class UserRepository {
 
   Future<void> saveApiAccessToken(String token) async {
     final preferences = await SharedPreferences.getInstance();
-    print("Saving API access token: $token");  // Log saved token
+    print("Saving API access token: $token"); // Log saved token
     await preferences.setString(_prefKeyToken, token);
 
     // Verify if token is saved correctly

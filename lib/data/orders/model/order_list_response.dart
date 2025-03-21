@@ -18,7 +18,7 @@ class OrderListResponse {
 
     Map<String, dynamic> toJson() => {
         "message": message,
-        "data": data.map((x) => x?.toJson()).toList(),
+        "data": data.map((x) => x.toJson()).toList(),
     };
 
 }

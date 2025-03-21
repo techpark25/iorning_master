@@ -22,13 +22,14 @@ class ProductList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Create a map from cart items based on productId
-   final Map<int, Cart> cartMap = {
-  for (var c in cart)
-    if (c.productId != null) c.productId! : c, // Only include cart items with non-null productId
-};
+    final Map<int, Cart> cartMap = {
+      for (var c in cart)
+        if (c.productId != null)
+          c.productId!: c, // Only include cart items with non-null productId
+    };
 
-
-    return ListView.builder(
+    return ListView.separated(
+      separatorBuilder: (context, index) => Divider(),
       itemCount: products.length,
       itemBuilder: (context, index) {
         // Get the corresponding cart item for the product, or use a default one if not found
@@ -38,7 +39,15 @@ class ProductList extends StatelessWidget {
           product: products[index],
           onAddToCart: onAddToCart,
           onRemoveFromCart: onRemoveFromCart,
-          cart: productCart ?? Cart(productId: products[index].id!, quantity: productCart?.quantity, id: null, userId: null, createdAt: null, updatedAt: null, product: null), // Default cart if not found
+          cart: productCart ??
+              Cart(
+                  productId: products[index].id!,
+                  quantity: productCart?.quantity,
+                  id: null,
+                  userId: null,
+                  createdAt: null,
+                  updatedAt: null,
+                  product: null), // Default cart if not found
         );
       },
     );
