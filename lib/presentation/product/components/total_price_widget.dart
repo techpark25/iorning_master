@@ -14,11 +14,11 @@ class TotalPriceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 00, horizontal: 20),
+      margin: const EdgeInsets.symmetric(vertical: 21, horizontal: 20),
       decoration: BoxDecoration(
         border: Border.all(
-            color: const Color.fromARGB(255, 255, 153, 155), width: 1),
-        color: AppThemes.lightSucessColor,
+            color: const Color.fromARGB(255, 185, 141, 255), width: 1),
+        color: const Color.fromARGB(255, 238, 228, 255),
         borderRadius: BorderRadius.circular(10.0),
       ),
       child: Padding(

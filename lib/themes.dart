@@ -6,12 +6,13 @@ class AppThemes {
   static const Color backgroundColor = Color.fromARGB(255, 242, 234, 255);
   static const Color darkBackgroundColor = Color(0xFF121212);
   static const Color lightSucessColor = Color.fromARGB(255, 255, 246, 246);
+  static const Color scaffoldBackgroundColor = Colors.white;
 
   // Light Theme
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     primaryColor: primaryColor,
-    scaffoldBackgroundColor: backgroundColor,
+    scaffoldBackgroundColor: scaffoldBackgroundColor,
     appBarTheme: const AppBarTheme(
       backgroundColor: primaryColor,
       foregroundColor: Colors.white,

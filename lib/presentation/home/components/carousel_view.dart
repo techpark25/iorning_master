@@ -78,7 +78,7 @@ class _CarouselViewwState extends State<CarouselVieww> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 0),
         // Uncomment if you want indicators
         // Row(
         //   mainAxisAlignment: MainAxisAlignment.center,

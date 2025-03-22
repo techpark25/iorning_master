@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:laundry_application/data/product/model/sub_category.dart';
 import 'package:laundry_application/themes.dart';
-
 import '../../../data/category/model/menu.dart';
 import '../../product/product_screen.dart';
-import '../../../data/category/model/category.dart';
 
-class CategoryList extends StatelessWidget {
+class CategoryList extends StatefulWidget {
   final List<Menu> categories;
-  final List<Subcategory> subcategories;
 
-  const CategoryList({
-    super.key,
-    required this.categories,
-    required this.subcategories,
-  });
+  const CategoryList({super.key, required this.categories});
+
+  @override
+  State<CategoryList> createState() => _CategoryListState();
+}
+
+class _CategoryListState extends State<CategoryList> {
+  int selectedCategoryIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -22,112 +22,151 @@ class CategoryList extends StatelessWidget {
     final double height = MediaQuery.of(context).size.height;
     final double catHeight = height * 0.14;
 
-    return SizedBox(
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: categories.length,
-        itemBuilder: (BuildContext context, int index) {
-          final category = categories[index];
+    // ✅ Handle case when categories list is empty
+    if (widget.categories.isEmpty) {
+      return const Center(
+        child: Text(
+          "No categories available",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: Row(
-              children: [
-                // **Category Title (Left Side - 10% Width)**
-                Expanded(
-                  child: Container(
-                    width: width * 0.1, // 10% of screen width
-                    height: catHeight, // Match category height
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: AppThemes.primaryColor, // Background color
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: RotatedBox(
-                      quarterTurns: 3, // Rotates text vertically
-                      child: Text(
-                        category.name ?? "",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
+    final Menu selectedCategory = widget.categories[selectedCategoryIndex];
+
+    return Stack(
+      children: [
+        Container(
+          width: double.infinity,
+          child: Opacity(
+            opacity: 0.8, // Adjust opacity (0.0 to 1.0)
+            child: Image.asset(
+              "assets/img/category-bg.jpg",
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Column(
+          children: [
+            const SizedBox(height: 20), // Add padding at the top
+            // *Category Selection List*
+            SizedBox(
+              height: 40, // Adjust height as needed
+              child: Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(widget.categories.length, (index) {
+                      final category = widget.categories[index];
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedCategoryIndex = index;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          margin: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: selectedCategoryIndex == index
+                                ? AppThemes.primaryColor
+                                : const Color.fromARGB(255, 247, 241, 255),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            category.name ?? "",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: selectedCategoryIndex == index
+                                  ? Colors.white
+                                  : Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    }),
                   ),
                 ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // *Subcategory Grid*
+            if (selectedCategory.categories.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  "No subcategories available",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+              )
+            else
+              SizedBox(
+                height: catHeight,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 0,
+                    mainAxisSpacing: 2,
+                    childAspectRatio: 1,
+                  ),
+                  itemCount: selectedCategory.categories.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 80),
+                  itemBuilder: (BuildContext context, int subIndex) {
+                    final subCategory = selectedCategory.categories[subIndex];
 
-                const SizedBox(width: 8), // Space between title & grid
-
-                // **Category Grid (Right Side - 90% Width)**
-                Expanded(
-                  flex: 13,
-                  child: SizedBox(
-                    height: catHeight, // Adjust height as needed
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3, // 3 items per row
-                        crossAxisSpacing: 12, // Horizontal spacing
-                        mainAxisSpacing: 12, // Vertical spacing
-                        childAspectRatio: 1, // Square items
+                    return GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ProductScreen(
+                            title: subCategory.name,
+                            categoryId: subCategory.id,
+                          ),
+                        ),
                       ),
-                      itemCount: category.categories.length,
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      itemBuilder: (BuildContext context, int subIndex) {
-                        final subCategory = category.categories[subIndex];
-
-                        return GestureDetector(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ProductScreen(
-                                title: subCategory.name,
-                                categoryId: subCategory.id,
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 90,
+                            width: 90,
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 255, 255, 255),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color.fromARGB(255, 217, 194, 255),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(17),
+                              child: subCategory.image != null &&
+                                      subCategory.image!.isNotEmpty
+                                  ? Image.network(subCategory.image!)
+                                  : const Icon(Icons.image,
+                                      size: 40, color: Colors.grey),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Expanded(
+                            child: Text(
+                              subCategory.name ?? '',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
-                          child: Column(
-                            children: [
-                              Container(
-                                height: 70,
-                                width: 70,
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromARGB(255, 246, 246, 246),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: const Color.fromARGB(
-                                          255, 224, 224, 224)),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(17),
-                                  child: Image.network(subCategory.image ?? ""),
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Expanded(
-                                child: Text(
-                                  subCategory.name ?? '',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }

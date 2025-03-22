@@ -7,6 +7,7 @@ import 'package:laundry_application/themes.dart';
 import 'package:laundry_application/utils/utils.dart';
 import 'package:provider/provider.dart';
 
+import '../orders/detail/order_tracking.dart';
 import '../user/login/login_screen.dart';
 import 'profile_view_model.dart';
 
@@ -213,7 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  const OrderListScreen()), // Navigate to Signup page
+                                  OrderTrackingApp()), // Navigate to Signup page
                         );
                       },
                     ),
@@ -305,7 +306,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       required String title,
       required VoidCallback onTap}) {
     return ListTile(
-      leading: Icon(icon, color: Colors.red), // Customize the color
+      leading: Icon(icon, color: AppThemes.primaryColor), // Customize the color
       title: Text(
         title,
         style: const TextStyle(fontSize: 18.0),

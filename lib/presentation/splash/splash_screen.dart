@@ -43,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset("assets/img/ironing-master-new-logo.png",
+                Image.asset("assets/img/ironing-master-final-logo-2.png",
                     width: 100, height: 100), // Add your logo
                 const SizedBox(height: 20),
                 // const Text(

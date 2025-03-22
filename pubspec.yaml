@@ -49,6 +49,7 @@ dependencies:
   geocoding: ^3.0.0
   flutter_dotenv: ^5.2.1
   url_launcher: ^6.1.14
+  timeline_tile: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -98,7 +99,13 @@ flutter:
      - assets/img/animation-confirm.json
      - assets/.env
      - assets/img/ironing-master-new-logo.png
+     - assets/img/ironing-master-final-logo-2.png
      - assets/img/all-category-icon.png
+     - assets/img/cat-bg.png
+     - assets/img/cat-bg-2.svg
+     - assets/img/cat-bg-3.png
+     - assets/img/cat-bg-4.png
+     - assets/img/category-bg.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

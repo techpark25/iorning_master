@@ -48,49 +48,48 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-  if (!mounted) return; // Ensure widget is still in the tree
+    if (!mounted) return; // Ensure widget is still in the tree
 
-  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  LocationPermission permission = await Geolocator.checkPermission();
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    LocationPermission permission = await Geolocator.checkPermission();
 
-  if (!serviceEnabled || permission == LocationPermission.denied) {
-    if (mounted) {
-      _showPermissionBottomSheet(); // Show bottom sheet if permission is not granted
+    if (!serviceEnabled || permission == LocationPermission.denied) {
+      if (mounted) {
+        _showPermissionBottomSheet(); // Show bottom sheet if permission is not granted
+      }
+      return;
     }
-    return;
+
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        setState(() {
+          _currentLocation = 'Location permission permanently denied';
+        });
+      }
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+
+    if (placemarks.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _currentLocation =
+              '${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}, ${placemarks.first.postalCode}, ${placemarks.first.country}';
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _currentLocation = '';
+        });
+      }
+    }
   }
-
-  if (permission == LocationPermission.deniedForever) {
-    if (mounted) {
-      setState(() {
-        _currentLocation = 'Location permission permanently denied';
-      });
-    }
-    return;
-  }
-
-  Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high);
-
-  List<Placemark> placemarks =
-      await placemarkFromCoordinates(position.latitude, position.longitude);
-
-  if (placemarks.isNotEmpty) {
-    if (mounted) {
-      setState(() {
-        _currentLocation =
-            '${placemarks.first.street}, ${placemarks.first.locality}, ${placemarks.first.administrativeArea}, ${placemarks.first.postalCode}, ${placemarks.first.country}';
-      });
-    }
-  } else {
-    if (mounted) {
-      setState(() {
-        _currentLocation = '';
-      });
-    }
-  }
-}
-
 
   void _showPermissionBottomSheet() {
     showModalBottomSheet(
@@ -133,11 +132,12 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-@override
-void dispose() {
-  super.dispose();
-  // Cancel any active location requests or listeners here
-}
+
+  @override
+  void dispose() {
+    super.dispose();
+    // Cancel any active location requests or listeners here
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,8 +172,7 @@ void dispose() {
                   const SizedBox(width: 8),
                   Text(
                     aviewModel.address.isNotEmpty
-                        ? _capitalizeFirstLetter(
-                            activeAddress?.name ?? '')
+                        ? _capitalizeFirstLetter(activeAddress?.name ?? '')
                         : 'Getting current location...',
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -244,7 +243,7 @@ void dispose() {
                 images: viewModel.carouselImages,
                 isLoading: viewModel.loadingCarouselImages,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 0),
 
               // Services Offered Title
               // const Center(
@@ -258,9 +257,10 @@ void dispose() {
               // ),
               CategoryList(
                 categories: viewModel.menus,
-                subcategories: pviewModel.subcategories,
               ),
-
+              SizedBox(
+                height: 0,
+              ),
               Container(
                 width: double.infinity, // Full width // Add padding for spacing
                 decoration: const BoxDecoration(

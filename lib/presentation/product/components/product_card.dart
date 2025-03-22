@@ -64,11 +64,11 @@ class ProductCard extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: const Color.fromARGB(255, 255, 171, 173),
+                  color: const Color.fromARGB(255, 185, 141, 255),
                   width: 1,
                 ),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
-                color: AppThemes.lightSucessColor,
+                color: const Color.fromARGB(255, 238, 228, 255),
               ),
               child: Row(
                 mainAxisSize:

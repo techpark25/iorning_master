@@ -13,7 +13,6 @@ class BottomNavBar extends StatelessWidget {
   final bool activeStatus;
   final VoidCallback onOnlinePayment;
   final VoidCallback onCOD;
-  
 
   const BottomNavBar({
     Key? key,
@@ -48,7 +47,7 @@ class BottomNavBar extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.location_on, color: Colors.red),
+                  const Icon(Icons.location_on, color: AppThemes.primaryColor),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
